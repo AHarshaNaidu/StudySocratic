@@ -65,41 +65,42 @@ if st.button('Start Teaching'):
         st.write(st.session_state.question_context)
 
 # Step 2: Student's Answer to the First Question
-student_answer = st.text_area("Your Answer:")
+if st.session_state.question_context:  # Check if a question has been generated
+    student_answer = st.text_area("Your Answer:")
 
-# Button to submit student's answer
-if st.button("Submit Answer"):
-    with st.spinner("Evaluating answer..."):
-        # Get the response from the AI based on student input and initial question
-        socratic_reply = socratic_response(student_answer, st.session_state.question_context)
-        
-        # Show assistant's response
-        st.write("### Assistant's Response:")
-        st.write(socratic_reply)
+    # Button to submit student's answer
+    if st.button("Submit Answer"):
+        with st.spinner("Evaluating answer..."):
+            # Get the response from the AI based on student input and initial question
+            socratic_reply = socratic_response(student_answer, st.session_state.question_context)
+            
+            # Show assistant's response
+            st.write("### Assistant's Response:")
+            st.write(socratic_reply)
 
-        # Store the conversation history
-        st.session_state.response_history.append({
-            "question": st.session_state.question_context,
-            "answer": student_answer,
-            "assistant_response": socratic_reply
-        })
-
-# Recursive follow-up: Probing based on the user's answer correctness
-if st.session_state.response_history:
-    follow_up_answer = st.text_area("Answer the last question posed by the assistant:")
-
-    if st.button('Submit Follow-up Answer'):
-        with st.spinner("Evaluating follow-up answer..."):
-            follow_up_reply = socratic_response(follow_up_answer, st.session_state.question_context)
-            st.write("### Assistant's Follow-up Question or Response:")
-            st.write(follow_up_reply)
-
-            # Store follow-up conversation in history
+            # Store the conversation history
             st.session_state.response_history.append({
                 "question": st.session_state.question_context,
-                "answer": follow_up_answer,
-                "assistant_response": follow_up_reply
+                "answer": student_answer,
+                "assistant_response": socratic_reply
             })
+
+    # Recursive follow-up: Probing based on the user's answer correctness
+    if st.session_state.response_history:
+        follow_up_answer = st.text_area("Answer the last question posed by the assistant:")
+
+        if st.button('Submit Follow-up Answer'):
+            with st.spinner("Evaluating follow-up answer..."):
+                follow_up_reply = socratic_response(follow_up_answer, st.session_state.question_context)
+                st.write("### Assistant's Follow-up Question or Response:")
+                st.write(follow_up_reply)
+
+                # Store follow-up conversation in history
+                st.session_state.response_history.append({
+                    "question": st.session_state.question_context,
+                    "answer": follow_up_answer,
+                    "assistant_response": follow_up_reply
+                })
 
 # End session button
 if st.button("End"):
